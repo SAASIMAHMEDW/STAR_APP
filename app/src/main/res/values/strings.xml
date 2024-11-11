@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">STAR</string>
+    <string name="gpu_on">GPU ON</string>
+    <string name="gpu_off">GPU OFF</string>
+    <string name="received_text_comes_here">received text comes here</string>
+    <string name="send">Send</string>
+    <string name="enter">enter</string>
+    <string name="connecting">CONNECTING...</string>
+</resources>
