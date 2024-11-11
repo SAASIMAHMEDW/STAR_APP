@@ -145,16 +145,43 @@ class Detector(
         detectorListener.onDetect(bestBoxes, inferenceTime)
     }
 
-    private fun bestBox(array: FloatArray) : List<BoundingBox>? {
-
+    private fun bestBox(array: FloatArray): List<BoundingBox>? {
         val boundingBoxes = mutableListOf<BoundingBox>()
+
+        // Item code mapping
+        val itemCodes = mapOf(
+            "Plastic" to "P",
+            "Plastic1" to "P",
+            "Straw" to "P",
+            "Bottle" to "P",
+            "Wrapper" to "P",
+            "Styrafoam" to "P",
+            "Cap" to "P",
+            "Cup" to "P",
+            "Spoon" to "P",
+            "Toothbrush" to "P",
+            "Comb" to "P",
+            "Tincan" to "M",
+            "Filter" to "M",
+            "Glassbottle" to "G",
+            "Glass" to "G",
+            "Bulb" to "G",
+            "Gonny" to "FR",
+            "Gloves" to "FR",
+            "Net" to "FR",
+            "Tyre" to "FR",
+            "Shoe" to "FR",
+            "Rope" to "x",
+            "Ball" to "x",
+            "Turtle" to "T"
+        )
 
         for (c in 0 until numElements) {
             var maxConf = CONFIDENCE_THRESHOLD
             var maxIdx = -1
             var j = 4
             var arrayIdx = c + numElements * j
-            while (j < numChannel){
+            while (j < numChannel) {
                 if (array[arrayIdx] > maxConf) {
                     maxConf = array[arrayIdx]
                     maxIdx = j - 4
@@ -165,24 +192,24 @@ class Detector(
 
             if (maxConf > CONFIDENCE_THRESHOLD) {
                 val clsName = labels[maxIdx]
+                val code = itemCodes[clsName] ?: "Unknown" // Get code for item
+
                 val cx = array[c] // 0
                 val cy = array[c + numElements] // 1
                 val w = array[c + numElements * 2]
                 val h = array[c + numElements * 3]
-                val x1 = cx - (w/2F)
-                val y1 = cy - (h/2F)
-                val x2 = cx + (w/2F)
-                val y2 = cy + (h/2F)
-                if (x1 < 0F || x1 > 1F) continue
-                if (y1 < 0F || y1 > 1F) continue
-                if (x2 < 0F || x2 > 1F) continue
-                if (y2 < 0F || y2 > 1F) continue
+                val x1 = cx - (w / 2F)
+                val y1 = cy - (h / 2F)
+                val x2 = cx + (w / 2F)
+                val y2 = cy + (h / 2F)
+
+                if (x1 < 0F || x1 > 1F || y1 < 0F || y1 > 1F || x2 < 0F || x2 > 1F || y2 < 0F || y2 > 1F) continue
 
                 boundingBoxes.add(
                     BoundingBox(
                         x1 = x1, y1 = y1, x2 = x2, y2 = y2,
                         cx = cx, cy = cy, w = w, h = h,
-                        cnf = maxConf, cls = maxIdx, clsName = clsName
+                        cnf = maxConf, cls = maxIdx, clsName = clsName, code = code // Add code
                     )
                 )
             }
@@ -192,6 +219,20 @@ class Detector(
 
         return applyNMS(boundingBoxes)
     }
+
+    private fun getCodeForLabel(label: String): String {
+        return when (label) {
+            "Plastic", "Plastic1", "Straw", "Bottle", "Wrapper", "Styrafoam", "Cap", "Cup", "Spoon", "Toothbrush", "Comb" -> "P"
+            "Tincan", "Filter" -> "M"
+            "Glassbottle", "Glass", "Bulb" -> "G"
+            "Gonny", "Gloves", "Net", "Tyre", "Shoe" -> "FR"
+            "Rope", "Ball" -> "X"
+            "Turtle" -> "T"
+            else -> "Unknown"
+        }
+    }
+
+
 
     private fun applyNMS(boxes: List<BoundingBox>) : MutableList<BoundingBox> {
         val sortedBoxes = boxes.sortedByDescending { it.cnf }.toMutableList()

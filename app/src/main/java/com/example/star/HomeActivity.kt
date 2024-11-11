@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.AspectRatio
@@ -162,6 +163,8 @@ class HomeActivity : AppCompatActivity(), Detector.DetectorListener {
         super.onDestroy()
         detector?.close()
         cameraExecutor.shutdown()
+        cameraProvider?.unbindAll()
+
     }
 
     override fun onResume() {
@@ -174,6 +177,7 @@ class HomeActivity : AppCompatActivity(), Detector.DetectorListener {
     }
 
     companion object {
+        private const val LARGE_WASTE_THRESHOLD = 5
         private const val TAG = "Camera"
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS = mutableListOf (
@@ -189,7 +193,21 @@ class HomeActivity : AppCompatActivity(), Detector.DetectorListener {
 
     override fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long) {
         runOnUiThread {
+            // Update UI with inference time
             binding.inferenceTime.text = "${inferenceTime}ms"
+
+            // Display the item codes in toast
+            for (box in boundingBoxes) {
+                val itemCode = box.code // Get the code of the detected item
+                Toast.makeText(this, "Detected: $itemCode", Toast.LENGTH_SHORT).show()
+            }
+
+            // Check for large waste detection
+            if (boundingBoxes.size > LARGE_WASTE_THRESHOLD) {
+                Toast.makeText(this, "LARGE WASTE DETECTED", Toast.LENGTH_LONG).show()
+            }
+
+            // Update overlay with bounding boxes
             binding.overlay.apply {
                 setResults(boundingBoxes)
                 invalidate()
