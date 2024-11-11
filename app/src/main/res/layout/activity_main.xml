@@ -39,7 +39,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@android:drawable/edit_text"
-            android:hint="Enter Target Device MAC Address (e.g., 00:21:13:00:75:E8)"
+            android:text="@string/mac_address"
+            android:hint="@string/enter_target_device_mac_address"
             android:inputType="text"
             android:padding="8dp" />
 

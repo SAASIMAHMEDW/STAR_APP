@@ -554,7 +554,8 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, markersList.toString(), Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { exception ->
-                Toast.makeText(this, "Error fetching data: ${exception.message}", Toast.LENGTH_SHORT).show()
+                Log.e("MARKERS","${exception.message}")
+                Toast.makeText(this, "Error fetching data from firebase firestore collection MARKERS: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
 }

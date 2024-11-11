@@ -6,4 +6,6 @@
     <string name="send">Send</string>
     <string name="enter">enter</string>
     <string name="connecting">CONNECTING...</string>
+    <string name="enter_target_device_mac_address">Enter Target Device MAC Address (e.g., 00:21:13:00:75:E8)</string>
+    <string name="mac_address">00:21:13:00:75:E8</string>
 </resources>
